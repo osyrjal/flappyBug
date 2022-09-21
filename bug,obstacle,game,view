@@ -1,0 +1,70 @@
+package o1.flappy
+
+import o1.*
+class Bug(start_pos: Pos):
+ def radius =15
+ var current_pos = start_pos
+ override def toString = "center at "+ this.pos +", radius "+this.radius
+ def pos = current_pos
+
+ def flap (läps: Double) =
+  current_pos=current_pos.addY(-läps)
+ def fall() =
+  current_pos=current_pos.addY(2)
+  
+end Bug
+
+
+
+class Obstacle(val radius: Int, var pos: Pos):
+
+  def approach() =
+    this.pos = this.pos.addX(-ObstacleSpeed)
+
+  override def toString = "center at " + this.pos + ", radius " + this.radius
+
+end Obstacle
+
+
+
+
+class Game():
+  val bug = Bug(Pos(100.0,40.0))
+  val obstacle = Obstacle(70,Pos(1000.0,100.0))
+  def timePasses() =
+   this.bug.fall()
+   this.obstacle.approach()
+  def activateBug() =
+    this.bug.flap(15)
+
+
+end Game
+
+
+package o1.flappy
+
+import o1.*
+
+// This class is introduced in Chapter 2.7.
+
+val sky        = rectangle(ViewWidth, ViewHeight,  LightBlue)
+val ground     = rectangle(ViewWidth, GroundDepth, SandyBrown)
+val trunk      = rectangle(30, 250, SaddleBrown)
+val foliage    = circle(200, ForestGreen)
+val tree       = trunk.onto(foliage, TopCenter, Center)
+val rootedTree = tree.onto(ground, BottomCenter, Pos(ViewWidth / 2, 30))
+val scenery    = sky.place(rootedTree, BottomLeft, BottomLeft)
+val bugPic = Pic("ladybug.png")
+
+def rockPic(obstacle: Obstacle) = circle(obstacle.radius * 2, Black)
+
+var peliolio = Game()
+
+object flappyView extends View(Game(),"FlappyBug"):
+  def makePic =
+   var tausta = scenery.place((bugPic),(peliolio.bug.pos))
+   tausta.place(rockPic(peliolio.obstacle),peliolio.obstacle.pos)
+end flappyView
+
+@main def launchFlappy() =
+  flappyView.start()
